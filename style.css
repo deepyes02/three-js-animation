@@ -1,0 +1,39 @@
+body{
+	margin: 0;
+  overflow-x: hidden;
+  height: 200vh;
+}
+
+.regularContents
+ {
+	height: 300px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 40px;
+  color: red;
+  border: 1px solid blue;
+ }
+  
+#animatorDiv{
+	position:fixed;
+	top:0;
+
+}
+canvas{
+	display: block;
+}
+#debug{
+	display:block;
+  font-family: monospace;
+  font-size: 18px;
+  width: 100%;
+  background: black;
+  color: white;
+  letter-spacing: 1px;
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  height: 20px;
+  padding: 5px 15px 20px 5px;
+}

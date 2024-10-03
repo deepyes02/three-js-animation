@@ -1,0 +1,24 @@
+{
+  "compilerOptions": {
+    "target": "esnext",
+    "module": "esnext",
+    "strict": true,
+    "jsx": "preserve",
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "moduleResolution": "node",
+    "baseUrl": ".",
+    "paths": {
+      "*": ["node_modules/*"]
+    }
+  },
+  "include": [
+    "**/*.ts",                             // Include all TypeScript files in the project directory and subdirectories
+    "**/*.d.ts"                            // Include all TypeScript declaration files
+  ],
+  "exclude": [
+    "node_modules",                        // Exclude node_modules
+    "dist"                                 // Exclude output directory
+  ]
+}
