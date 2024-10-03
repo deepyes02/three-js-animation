@@ -1,87 +1,110 @@
-import * as THREE from 'three';
+import { Scene, Sphere, Camera, Renderer, PerspectiveCamera, WebGLRenderer, SphereGeometry, TextureLoader, MeshStandardMaterial, Mesh, CircleGeometry, MeshBasicMaterial, PointLight, AmbientLight, PointLightHelper } from 'three';
 
-
-class ThreeJsInit{
-
-
+class ThreeJsInit {
+	scene: Scene;
+	camera: PerspectiveCamera;
+	renderer: WebGLRenderer;
+	window: Window = window;
 	// first we will define a few static variables, that are beyond constant
-	static debug : HTMLElement | null = document.querySelector('#debug');
-	static animatorDiv : HTMLDivElement | null = document.body.querySelector("#animatorDiv");
+	static debug: HTMLElement | null = document.querySelector('#debug');
+	static animatorDiv: HTMLDivElement | null = document.body.querySelector("#animatorDiv");
 
-	public constructor () {
-		window.alert('yo man what\'s up ?');
+	public constructor() {
+
+		this.scene = new Scene();
+		this.camera = new PerspectiveCamera(
+			75,
+			window.innerWidth / window.innerHeight,
+			1,
+			1000
+		);
+		this.renderer = new WebGLRenderer({ alpha: true });
+		this.initializeThreeJS();
+	}
+	private initializeThreeJS() {
+		if (ThreeJsInit.animatorDiv) {
+			// Set renderer size and append to document
+			this.renderer.setSize(window.innerWidth, window.innerHeight);
+			ThreeJsInit.animatorDiv.appendChild(this.renderer.domElement);
+			this.restOfTheCodeWeShouldRefactorLater();
+		}
+		else {
+			console.error("Sorry the animator div is not found")
+		}
 	}
 
-	
+
+	private restOfTheCodeWeShouldRefactorLater() {
+		// Create a simple cube geometry and material
+		// (() => {
+			const segments = 4;
+			const geometry = new SphereGeometry(20, segments, segments);
+			const textureLoader = new TextureLoader();
+			const texture = textureLoader.load('./earth-nasa.jpg');
+
+
+			const material = new MeshStandardMaterial({ map: texture });
+			const sphere = new Mesh(geometry, material);
+			this.scene.add(sphere);
+		// })();
+
+		// Let's add a circle
+		// (() => {
+		// 	const circleGeometry = new CircleGeometry(20, 64);
+		// 	const circleMaterial = new MeshBasicMaterial({ color: 'green' });
+		// 	const circleMesh = new Mesh(circleGeometry, circleMaterial);
+		// 	this.scene.add(circleMesh)
+		// })();
+
+		// Add Point Light
+		(() => {
+			// Create a PointLight
+			const light = new PointLight(0xff00ff, 1, 200, 2);
+
+			// Set the position of the light
+			light.position.set(0, 0, 0); // Moved away from the origin
+
+			// Optionally, add a light helper to visualize the light position
+			const lightHelper = new PointLightHelper(light, 1);
+			this.scene.add(lightHelper);
+
+			// Add the light to the scene
+			this.scene.add(light);
+		})();
+
+		(() => {
+			// Add an ambient light
+			const ambientLight = new AmbientLight(0xffffff, 3); // Soft white light
+			this.scene.add(ambientLight);
+		})()
+
+		// Set the camera position
+		this.camera.position.z = 150;
+
+		// Animation parameters
+		let scrollY = 0;
+		let maxScale = 200;
+		let scrollMax = window.innerHeight * 1 // Adjust as needed for your scroll height
+
+		const animate = () => {
+			requestAnimationFrame(animate)
+			this.renderer.render(this.scene, this.camera)
+
+			scrollY = window.scrollY;
+			const progress = Math.min(scrollY / scrollMax, 1);
+			const scale = progress * (maxScale + 2)
+			sphere.scale.set(scale, scale, scale)
+			sphere.rotation.set(0, scale / 10, 0);
+			if (ThreeJsInit.debug) {
+				ThreeJsInit.debug.innerHTML = `scrollY => ${scrollY}, progress => ${(progress * 100)}, scale => ${scale}`
+			};
+
+
+
+		}
+		animate();
+	}
+
 
 }
 new ThreeJsInit();
-
-
-
-
-// Set up the scene, camera, and renderer
-const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera(
-  75,
-  window.innerWidth / window.innerHeight,
-  1,
-  1000
-);
-
-const renderer = new THREE.WebGLRenderer({ alpha: true });
-
-// Set renderer size and append to document
-renderer.setSize(window.innerWidth, window.innerHeight);
-ThreeJsInit.animatorDiv?.appendChild(renderer.domElement);
-
-// Create a simple cube geometry and material
-const segments = 64;
-const geometry = new THREE.SphereGeometry(1, segments, segments);
-const textureLoader = new THREE.TextureLoader();
-const texture = textureLoader.load('./earth-nasa.jpg');
-
-const material = new THREE.MeshStandardMaterial({map: texture});
-const sphere = new THREE.Mesh(geometry, material);
-scene.add(sphere);
-
-// Let's add a circle
-(()=>{
-	const circleGeometry = new THREE.CircleGeometry(20, 64);
-	const circleMaterial = new THREE.MeshBasicMaterial({color: 'red'});
-	const circleMesh = new THREE.Mesh(circleGeometry, circleMaterial);
-	scene.add(circleMesh)
-})();
-
-
-const light = new THREE.PointLight(0xffffff, 1);
-light.position.set(100,100,0);
-
-// Add an ambient light
-const ambientLight = new THREE.AmbientLight(0xffffff, 1); // Soft white light
-scene.add(ambientLight);
-
-// Set the camera position
-camera.position.z = 150;
-
-// Animation parameters
-let scrollY = 0;
-let maxScale = 200;
-let scrollMax = window.innerHeight * 1 // Adjust as needed for your scroll height
-
-window.addEventListener("scroll", () => {
-  scrollY = window.scrollY;
-  const progress = Math.min(scrollY / scrollMax, 1);
-  const scale = progress * (maxScale+2)
-  sphere.scale.set(scale, scale, scale)
-	sphere.rotation.set(0, scale * 2, 0);
-  if (debug) debug.innerHTML = `scrollY => ${scrollY}, progress => ${(progress * 100)}, scale => ${scale}`;
-});
-
-// Animation loop
-function animate() {
-  requestAnimationFrame(animate);
-  renderer.render(scene, camera);
-}
-
-animate();
